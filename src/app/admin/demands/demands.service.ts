@@ -43,7 +43,7 @@ export class DemandsService {
     });
   }
 
-  assignToVolunteer(demands: Demand[] = [], volunteerId: string = '') {
+  assignToVolunteer(demands: Demand[] = [], volunteerId: string) {
     return this.http.post<any>(`${environment.url}/clusters`, {
       volunteer: `${volunteerId}`,
       request_list: demands.map((demand) => demand._id),

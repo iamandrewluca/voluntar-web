@@ -1,3 +1,123 @@
+<div class="row no-gutters bg-white mat-typography my-3">
+  <div class="col-8">
+    <app-the-map
+      [demands]="testDemands"
+      (demandClick)="demandClick($event)"
+    ></app-the-map>
+  </div>
+  <div class="col-4">
+    <h3 class="text-center my-2" [ngSwitch]="stepOnSelectionZone">
+      <strong *ngSwitchCase="1">Selectare Beneficiari</strong>
+      <strong *ngSwitchCase="2">Selectare Voluntari</strong>
+      <strong *ngSwitchCase="3">FINISH!</strong>
+    </h3>
+
+    <div class="container py-3 bg-light border-top border-bottom">
+      <div class="row">
+        <div class="col-6">
+          <label class="mb-0 d-block">
+            <select name="" id="1" class="w-100">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="mb-0 d-block">
+            <select name="" id="2" class="w-100">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <ng-container [ngSwitch]="stepOnSelectionZone">
+      <div *ngSwitchCase="1">
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-around center"
+          style="border: 1px solid #ccc"
+        >
+          <div fxFlex="45" style="background-color: aquamarine">
+            <mat-select
+              formControlName="city_sector"
+              placeholder="Sector"
+              (selectionChange)="filterChanged()"
+            >
+              <mat-option>{{ "toate" | translate }}</mat-option>
+              <mat-option *ngFor="let zone of zones" [value]="zone">
+                {{ zone | translate }}
+              </mat-option>
+            </mat-select>
+          </div>
+          <div fxFlex="45" style="background-color: rgb(51, 185, 141)">
+            <mat-select
+              formControlName="needs"
+              placeholder="Necesitate"
+              (selectionChange)="filterChanged()"
+            >
+              <mat-option [value]="anyDemand">any</mat-option>
+              <mat-option *ngFor="let demand of demandTypes" [value]="demand">
+                {{ demand | translate }}
+              </mat-option>
+            </mat-select>
+          </div>
+        </div>
+        <app-demand-selection
+          [selectedDemands]="selectedDemands"
+        ></app-demand-selection>
+      </div>
+
+      <app-volunteer-selection
+        *ngSwitchCase="2"
+        (selectedVolunteer)="selectedVolunteerProvided($event)"
+      ></app-volunteer-selection>
+
+      <div *ngSwitchCase="3">
+        <p>Sarcina este În Proces.</p>
+        <p>Link-ul a fost trimis voluntarului pe email.</p>
+
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon svgIcon="selection-dot"></mat-icon>
+              {{ selectedVolunteer.first_name || "_???_" }}
+            </mat-card-title>
+            <mat-card-subtitle>
+              <mat-icon style="font-size: 12px">place</mat-icon>
+              {{ selectedVolunteer.zone }}
+            </mat-card-subtitle>
+            <mat-card-subtitle>
+              <mat-icon style="font-size: 16px">mail</mat-icon>
+              {{ selectedVolunteer.email || "nedeterminat" }}
+            </mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+      </div>
+    </ng-container>
+
+    <!-- Add small pagination -->
+
+    <div class="text-center py-2 border-top">
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="nextFormStep()"
+        [ngSwitch]="stepOnSelectionZone"
+      >
+        <span *ngSwitchCase="1">Următor</span>
+        <span *ngSwitchCase="2">Alocă</span>
+        <span *ngSwitchCase="3">Sarcină Nouă</span>
+        <span *ngSwitchDefault>ERROR !!!</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <mat-expansion-panel hideToggle class="shadow-none">
   <mat-expansion-panel-header>
     <mat-panel-title class="d-flex justify-content-center">
@@ -6,139 +126,7 @@
     </mat-panel-title>
   </mat-expansion-panel-header>
   <div class="mx-n4 mb-n3">
-    <div class="row">
-      <div class="col-8">
-        <map #map></map>
-      </div>
-      <div class="col-4">
-        <div fxLayout="column" style="border: 1px solid rgb(73, 71, 189)">
-          <!-- TODO  -->
-          <form [formGroup]="form" (ngSubmit)="onSubmit($event)">
-            <div id="selection_div">
-              <div fxLayout="column">
-                <div
-                  fxLayoutAlign="center center"
-                  [ngSwitch]="stepOnSelectionZone"
-                >
-                  <span *ngSwitchCase="1">Selectare Beneficiari</span>
-                  <span *ngSwitchCase="2">Selectare Voluntari</span>
-                  <span *ngSwitchCase="3">FINISH!</span>
-                </div>
-              </div>
-            </div>
-            <!-- -------STEP 1*3---------- -->
-            <div>
-              <!-- --------- 1 ----------------- -->
-              <div *ngIf="stepOnSelectionZone === 1">
-                <div
-                  fxLayout="row"
-                  fxLayoutAlign="space-around center"
-                  style="border: 1px solid #ccc"
-                >
-                  <div fxFlex="45" style="background-color: aquamarine">
-                    <mat-select
-                      formControlName="city_sector"
-                      placeholder="Sector"
-                      (selectionChange)="filterChanged()"
-                    >
-                      <mat-option>{{ "toate" | translate }}</mat-option>
-                      <mat-option *ngFor="let zone of zones" [value]="zone">
-                        {{ zone | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </div>
-                  <div fxFlex="45" style="background-color: rgb(51, 185, 141)">
-                    <mat-select
-                      formControlName="needs"
-                      placeholder="Necesitate"
-                      (selectionChange)="filterChanged()"
-                    >
-                      <mat-option [value]="anyDemand">any</mat-option>
-                      <mat-option
-                        *ngFor="let demand of demandTypes"
-                        [value]="demand"
-                      >
-                        {{ demand | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </div>
-                </div>
-                <app-demand-selection
-                  [selectedDemands]="selectedDemands"
-                ></app-demand-selection>
-              </div>
-              <!-- --------- 2 ----------------- -->
-              <div *ngIf="stepOnSelectionZone === 2">
-                <app-volunteer-selection
-                  (selectedVolunteer)="selectedVolunteerProvided($event)"
-                ></app-volunteer-selection>
-              </div>
-              <!-- --------- 3 ----------------- -->
-              <div *ngIf="stepOnSelectionZone === 3">
-                <div>
-                  <p>Sarcina este În Proces.</p>
-                  <p>Link-ul a fost trimis voluntarului pe email.</p>
-
-                  <mat-card>
-                    <mat-card-header>
-                      <mat-card-title>
-                        <mat-icon svgIcon="selection-dot"></mat-icon>
-                        {{ selectedVolunteer.first_name || "_???_" }}
-                      </mat-card-title>
-                      <mat-card-subtitle>
-                        <mat-icon style="font-size: 12px">place</mat-icon>
-                        {{ selectedVolunteer.zone }}
-                      </mat-card-subtitle>
-                      <mat-card-subtitle>
-                        <mat-icon style="font-size: 16px">mail</mat-icon>
-                        {{ selectedVolunteer.email || "nedeterminat" }}
-                      </mat-card-subtitle>
-                    </mat-card-header>
-                  </mat-card>
-                </div>
-              </div>
-            </div>
-          </form>
-          <div
-            fxLayout="column"
-            fxLayoutAlign="center center"
-            style="margin: 5px; width: 100%"
-          >
-            <div
-              fxLayout="row"
-              fxLayoutAlign="center center"
-              style="
-                background-color: #ffffff !important;
-                border: 1px solid red;
-                height: 10px;
-                width: 100%;
-              "
-            >
-              <div *ngFor="let a of [].constructor(3); let i = index">
-                <div *ngIf="i + 1 !== stepOnSelectionZone; else filledpoint">
-                  <mat-icon>gps_not_fixed</mat-icon>
-                </div>
-                <ng-template #filledpoint>
-                  <mat-icon>gps_fixed</mat-icon>
-                </ng-template>
-              </div>
-            </div>
-
-            <button
-              mat-flat-button
-              color="primary"
-              style="width: 100px"
-              (click)="nextFormStep()"
-              [ngSwitch]="stepOnSelectionZone"
-            >
-              <span *ngSwitchCase="1">Următor</span>
-              <span *ngSwitchCase="2">Alocă</span>
-              <span *ngSwitchCase="3">Sarcină Nouă</span>
-              <span *ngSwitchDefault>ERROR !!!</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis,
+    vero!
   </div>
 </mat-expansion-panel>

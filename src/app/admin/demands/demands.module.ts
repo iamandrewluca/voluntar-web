@@ -13,6 +13,7 @@ import { DemandsMapComponent } from './shared/demands-map/demands-map.component'
 import { DemandSelectionOnMapComponent } from './shared/demands-map/demand-selection/demand-selection.component';
 import { VolunteerSelectionOnMapComponent } from './shared/demands-map/volunteer-selection/volunteer-selection.component';
 import { FilterByNameOrFamilyPipe } from '@app/shared/pipes/filter-by-name-or-family.pipe';
+import { TheMapComponent } from '@demands/shared/the-map/the-map.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { FilterByNameOrFamilyPipe } from '@app/shared/pipes/filter-by-name-or-fa
     DemandSelectionOnMapComponent,
     VolunteerSelectionOnMapComponent,
     FilterByNameOrFamilyPipe,
+    TheMapComponent,
   ],
   imports: [
     CommonModule,

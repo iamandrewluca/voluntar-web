@@ -23,6 +23,7 @@ import { demandTypes } from '@demands/shared/demand-type';
 import { Volunteer } from '@volunteers/shared/volunteer';
 import { Coordinate, zones, zonesCoordinates } from '@shared/zone';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
+import { SelectableDemand } from '@demands/shared/the-map/the-map.component';
 
 config.assetsPath = '/assets';
 
@@ -36,10 +37,7 @@ const defaultCoordinate: Coordinate = {
   templateUrl: './demands-map.component.html',
   styleUrls: ['./demands-map.component.scss'],
 })
-export class DemandsMapComponent implements OnDestroy, OnInit, AfterViewInit {
-  @ViewChild('map', { static: true }) private mapViewEl: ElementRef;
-  mapView: MapView;
-  graphicsLayer = new GraphicsLayer();
+export class DemandsMapComponent implements OnInit {
   demands: Demand[] = [];
   zones = zones;
   demandTypes = demandTypes;
@@ -53,21 +51,1057 @@ export class DemandsMapComponent implements OnDestroy, OnInit, AfterViewInit {
   selectedCityZone = '';
   selectedDemandTypeFilter = '';
   anyDemand = 'any';
-  simpleMarkerSymbol = new SimpleMarkerSymbol({
-    color: [255, 255, 255, 0.3],
-    style: 'circle',
-    outline: {
-      color: [226, 119, 40],
-      width: 2,
+
+  testDemands = ([
+    {
+      _id: '60068ce6e8b98d3798a733d7',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733d0',
+        address: 'str G. Asachi 54',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 3',
+        floor: '5',
+        landline: '22835604',
+        last_name: 'Troscot',
+        latitude: 47.02064170463425,
+        longitude: 28.81327719517353,
+        phone: '68078004',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'Far Congress administration author surface woman. Support especially into.',
+      created_at: 'Thu, 07 May 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3529,
+      secret: null,
+      status: 'in_process',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '60171c4db19f87178436e93f',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
     },
-  });
-  changedMarkerSymbol = new SimpleMarkerSymbol({
-    color: [60, 210, 120, 0.7],
-    outline: {
-      color: [0, 0, 0, 0.7],
-      width: 1,
+    {
+      _id: '60068ce6e8b98d3798a733cf',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c8',
+        address: 'str G. Asachi 53',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 2',
+        floor: '5',
+        landline: '22835603',
+        last_name: 'Troscot',
+        latitude: 47.02760947410315,
+        longitude: 28.817615183891398,
+        phone: '68078003',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments:
+        'Such able language now short think consumer clear. Husband time rate surface air nature safe Mr. News world radio senior because.',
+      created_at: 'Wed, 06 May 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3523,
+      secret: null,
+      status: 'archived',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600982d57f3dddcc23be86c7',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
     },
-  });
+    {
+      _id: '60068ce6e8b98d3798a733c7',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c0',
+        address: 'str G. Asachi 52',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 1',
+        floor: '5',
+        landline: '22835602',
+        last_name: 'Troscot',
+        latitude: 47.02551502546477,
+        longitude: 28.817024770503707,
+        phone: '68078002',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'botanica',
+      },
+      comments:
+        'Discuss her deal play decision seven. Enough dinner until hair word bring mean.',
+      created_at: 'Tue, 05 May 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3517,
+      secret: null,
+      status: 'archived',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '600709077f3dddcc23be86c4',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733bf',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b8',
+        address: 'str G. Asachi 51',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 0',
+        floor: '5',
+        landline: '22835601',
+        last_name: 'Troscot',
+        latitude: 47.02744274608524,
+        longitude: 28.817665968756344,
+        phone: '68078001',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments: 'Dark fly hard yard former.',
+      created_at: 'Mon, 04 May 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3511,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733aa',
+        cluster_id: '600982aa7f3dddcc23be86c6',
+        first_name: 'Serghei',
+        last_name: 'Volkov',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733b7',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b0',
+        address: 'str G. Asachi 56',
+        age: 76,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile',
+        floor: '5',
+        landline: '22835600',
+        last_name: 'Troscot',
+        latitude: 47.03226007,
+        longitude: 28.84571999,
+        phone: '68078000',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments:
+        'Student center play method. Red shake common newspaper late response institution. Read everybody research operation require education movement.',
+      created_at: 'Sun, 03 May 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3505,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733aa',
+        cluster_id: '60068ce6e8b98d3798a733b1',
+        first_name: 'Serghei',
+        last_name: 'Volkov',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733d5',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733d0',
+        address: 'str G. Asachi 54',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 3',
+        floor: '5',
+        landline: '22835604',
+        last_name: 'Troscot',
+        latitude: 47.02064170463425,
+        longitude: 28.81327719517353,
+        phone: '68078004',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'Life measure experience back art assume. Mission bad one majority up everyone maintain person.',
+      created_at: 'Tue, 07 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3527,
+      secret: null,
+      status: 'in_process',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '601078f8ef0403db23e0adcb',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733d6',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733d0',
+        address: 'str G. Asachi 54',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 3',
+        floor: '5',
+        landline: '22835604',
+        last_name: 'Troscot',
+        latitude: 47.02064170463425,
+        longitude: 28.81327719517353,
+        phone: '68078004',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'None size nation two prevent film think. Traditional join box choose capital.',
+      created_at: 'Tue, 07 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3528,
+      secret: null,
+      status: 'in_process',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '601072b1ef0403db23e0adca',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733ce',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c8',
+        address: 'str G. Asachi 53',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 2',
+        floor: '5',
+        landline: '22835603',
+        last_name: 'Troscot',
+        latitude: 47.02760947410315,
+        longitude: 28.817615183891398,
+        phone: '68078003',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments: 'Eye data prevent current care everything her must.',
+      created_at: 'Mon, 06 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3522,
+      secret: null,
+      status: 'confirmed',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '6007077b7f3dddcc23be86c3',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733cd',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c8',
+        address: 'str G. Asachi 53',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 2',
+        floor: '5',
+        landline: '22835603',
+        last_name: 'Troscot',
+        latitude: 47.02760947410315,
+        longitude: 28.817615183891398,
+        phone: '68078003',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments: 'Deep treatment again. Two letter product.',
+      created_at: 'Mon, 06 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3521,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '600709077f3dddcc23be86c4',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733c5',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c0',
+        address: 'str G. Asachi 52',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 1',
+        floor: '5',
+        landline: '22835602',
+        last_name: 'Troscot',
+        latitude: 47.02551502546477,
+        longitude: 28.817024770503707,
+        phone: '68078002',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'botanica',
+      },
+      comments:
+        'Someone strategy sit of loss whether. Car seven surface matter never military.',
+      created_at: 'Sun, 05 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3515,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '6007077b7f3dddcc23be86c3',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733c6',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c0',
+        address: 'str G. Asachi 52',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 1',
+        floor: '5',
+        landline: '22835602',
+        last_name: 'Troscot',
+        latitude: 47.02551502546477,
+        longitude: 28.817024770503707,
+        phone: '68078002',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'botanica',
+      },
+      comments:
+        'Attack put into opportunity. Once onto success. Great bill reduce treat community room individual.',
+      created_at: 'Sun, 05 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3516,
+      secret: null,
+      status: 'canceled',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600705ff7f3dddcc23be86c2',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733be',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b8',
+        address: 'str G. Asachi 51',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 0',
+        floor: '5',
+        landline: '22835601',
+        last_name: 'Troscot',
+        latitude: 47.02744274608524,
+        longitude: 28.817665968756344,
+        phone: '68078001',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'Sure charge four fine decision past bag. Instead general room feeling very among nor create.',
+      created_at: 'Sat, 04 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3510,
+      secret: null,
+      status: 'solved',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600705ff7f3dddcc23be86c2',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733bd',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b8',
+        address: 'str G. Asachi 51',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 0',
+        floor: '5',
+        landline: '22835601',
+        last_name: 'Troscot',
+        latitude: 47.02744274608524,
+        longitude: 28.817665968756344,
+        phone: '68078001',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'Mother will might pay. Expect hand beautiful treat information past commercial. Land political of debate stock food. Home get interesting across east beautiful.',
+      created_at: 'Sat, 04 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3509,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '6007077b7f3dddcc23be86c3',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733b5',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b0',
+        address: 'str G. Asachi 56',
+        age: 76,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile',
+        floor: '5',
+        landline: '22835600',
+        last_name: 'Troscot',
+        latitude: 47.03226007,
+        longitude: 28.84571999,
+        phone: '68078000',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments:
+        'Score company notice situation national medical. Common quality indeed detail over. Your choice toward heavy.',
+      created_at: 'Fri, 03 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3503,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600982d57f3dddcc23be86c7',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733b6',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b0',
+        address: 'str G. Asachi 56',
+        age: 76,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile',
+        floor: '5',
+        landline: '22835600',
+        last_name: 'Troscot',
+        latitude: 47.03226007,
+        longitude: 28.84571999,
+        phone: '68078000',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments:
+        'Get kid loss organization concern can. Young happen black mission. Upon statement analysis see for goal total whom.',
+      created_at: 'Fri, 03 Apr 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3504,
+      secret: null,
+      status: 'confirmed',
+      type: 'medicine',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ad',
+        cluster_id: '600709077f3dddcc23be86c4',
+        first_name: 'Serghei',
+        last_name: 'Breter',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733d4',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733d0',
+        address: 'str G. Asachi 54',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 3',
+        floor: '5',
+        landline: '22835604',
+        last_name: 'Troscot',
+        latitude: 47.02064170463425,
+        longitude: 28.81327719517353,
+        phone: '68078004',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'Seat miss win ever. Small develop drug indeed threat my nothing. Hold process event in detail world another begin.',
+      created_at: 'Sat, 07 Mar 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3526,
+      secret: null,
+      status: 'in_process',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '60106abbef0403db23e0adc8',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733cc',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c8',
+        address: 'str G. Asachi 53',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 2',
+        floor: '5',
+        landline: '22835603',
+        last_name: 'Troscot',
+        latitude: 47.02760947410315,
+        longitude: 28.817615183891398,
+        phone: '68078003',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments:
+        'Today door city garden local. Partner culture year before book establish key. Go yet any ability ok.',
+      created_at: 'Fri, 06 Mar 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3520,
+      secret: null,
+      status: 'canceled',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600705ff7f3dddcc23be86c2',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733c4',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733c0',
+        address: 'str G. Asachi 52',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 1',
+        floor: '5',
+        landline: '22835602',
+        last_name: 'Troscot',
+        latitude: 47.02551502546477,
+        longitude: 28.817024770503707,
+        phone: '68078002',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'botanica',
+      },
+      comments:
+        'Pattern six energy question. Safe tax head current window near. Store memory day including view girl.',
+      created_at: 'Thu, 05 Mar 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3514,
+      secret: null,
+      status: 'confirmed',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600702c17f3dddcc23be86c0',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733bc',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b8',
+        address: 'str G. Asachi 51',
+        age: 80,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile 0',
+        floor: '5',
+        landline: '22835601',
+        last_name: 'Troscot',
+        latitude: 47.02744274608524,
+        longitude: 28.817665968756344,
+        phone: '68078001',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'telecentru',
+      },
+      comments:
+        'No suddenly wide great all. Series event wear pass attorney such financial. Interest economic newspaper ever money from argue group.',
+      created_at: 'Wed, 04 Mar 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3508,
+      secret: null,
+      status: 'confirmed',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600705287f3dddcc23be86c1',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+    {
+      _id: '60068ce6e8b98d3798a733b4',
+      beneficiary: {
+        _id: '60068ce6e8b98d3798a733b0',
+        address: 'str G. Asachi 56',
+        age: 76,
+        apartment: '5',
+        black_list: false,
+        created_at: 'Wed, 08 Jan 2020 00:00:00 GMT',
+        entrance: '5',
+        first_name: 'Vasile',
+        floor: '5',
+        landline: '22835600',
+        last_name: 'Troscot',
+        latitude: 47.03226007,
+        longitude: 28.84571999,
+        phone: '68078000',
+        source: 'linia_verde',
+        special_condition: 'deaf_mute',
+        zone: 'centru',
+      },
+      comments:
+        'Box show talk house general spring. Out since show child world meeting.',
+      created_at: 'Tue, 03 Mar 2020 00:00:00 GMT',
+      has_symptoms: false,
+      number: 3502,
+      secret: null,
+      status: 'confirmed',
+      type: 'warm_lunch',
+      urgent: false,
+      user: {
+        _cls: 'User.Operator',
+        _id: '60068ce5e8b98d3798a733a7',
+        availability_days: [],
+        created_at: 'Tue, 19 Jan 2021 07:40:19 GMT',
+        created_by: 'admin',
+        email: 'ureche@example.com',
+        first_name: 'Grigore',
+        is_active: true,
+        last_access: 'Tue, 02 Feb 2021 19:00:23 GMT',
+        last_name: 'Ureche',
+        logins: [],
+        role: ['fixer'],
+        roles: ['admin'],
+      },
+      volunteer: {
+        _id: '60068ce6e8b98d3798a733ac',
+        cluster_id: '600705287f3dddcc23be86c1',
+        first_name: 'Ivan',
+        last_name: 'Cretu',
+      },
+    },
+  ] as unknown) as SelectableDemand[];
+
+  demandClick(demand: SelectableDemand) {
+    this.testDemands = this.testDemands.map((d) =>
+      d._id !== demand._id
+        ? d
+        : {
+            ...d,
+            selected: !demand.selected,
+          },
+    );
+  }
 
   constructor(
     private demandsService: DemandsService,
@@ -76,75 +1110,15 @@ export class DemandsMapComponent implements OnDestroy, OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): any {
-    // Geographic data stored temporarily in memory.
-    // Displaying individual geographic features as graphics, visual aids or text on the map.
     this.initializeDemandsOnTheMap('init');
-  }
-
-  ngAfterViewInit() {
-    this.mapView = new MapView({
-      center: [28.825140232956283, 47.01266177894471],
-      container: this.mapViewEl.nativeElement,
-      zoom: 12,
-      map: new Map({
-        basemap: 'streets-navigation-vector', // possible: topo-vector
-        layers: [this.graphicsLayer],
-      }),
-    });
-
-    this.mapView.on('click', (ev) => {
-      this.mapView.hitTest(ev.screenPoint).then((res) => {
-        if (
-          res.results.length < 1 || // clicked to no object on the map
-          res.results[0].graphic.attributes?.demandId === undefined
-        )
-          return;
-
-        const gr: Graphic = res.results[0].graphic;
-        if (gr) {
-          const exist = this.selectedDemands.find(
-            (r) => r._id === gr.attributes.demandId,
-          );
-          if (exist === undefined) {
-            //in case of missed - add demand to the selected demands and make it green on map
-            this.selectedDemands.push(
-              this.demands.find((r) => r._id === gr.attributes.demandId),
-            );
-            this.selectedDemands = [...this.selectedDemands];
-            gr.symbol.set('color', this.changedMarkerSymbol.color);
-          } else {
-            //in case of exist - remove demand from selected and make it white on map
-            this.selectedDemands = this.selectedDemands.filter(
-              (r) => r !== exist,
-            );
-            gr.symbol.set('color', this.simpleMarkerSymbol.color);
-          }
-          this.graphicsLayer.add(gr.clone());
-          this.graphicsLayer.remove(gr);
-
-          //next row needs to proceed detectChanges by Angular
-          this.cdr.detectChanges();
-        }
-      });
-      //center map view to selected point
-      this.mapView.goTo({ center: ev.mapPoint });
-    });
   }
 
   initializeDemandsOnTheMap(
     status: 'init' | 'filter',
     filters: any = {},
   ): void {
-    if (status === 'init') {
-      this.selectedDemands = [];
-    } else {
-      this.graphicsLayer.removeAll();
-      this.selectedDemands.forEach((el) =>
-        this.addDemandToMap(el, this.changedMarkerSymbol),
-      );
-    }
-    from(
-      this.demandsService.getDemands(
+    this.demandsService
+      .getDemands(
         {
           pageIndex: 1,
           pageSize: 20000,
@@ -153,40 +1127,11 @@ export class DemandsMapComponent implements OnDestroy, OnInit, AfterViewInit {
           status: 'confirmed',
           ...filters,
         },
-      ),
-    ).subscribe(
-      (res) => {
-        this.demands = res.list;
-        this.demands.forEach((el) =>
-          this.addDemandToMap(el, this.simpleMarkerSymbol),
-        );
-      },
-      (err) => console.log('Error getting demands from server! ', err),
-    );
-  }
-
-  addDemandToMap(demand: Demand, symbol: SimpleMarkerSymbol): void {
-    if (
-      !demand.beneficiary.latitude ||
-      !demand.beneficiary.longitude ||
-      !demand.beneficiary.zone
-    ) {
-      throw new Error(`Cannot locate beneficiary: ${demand.beneficiary._id}`);
-    }
-
-    this.graphicsLayer.add(
-      new Graphic({
-        geometry: new Point({
-          latitude: demand.beneficiary.latitude,
-          longitude: demand.beneficiary.longitude,
-        }),
-        symbol,
-        attributes: {
-          demandId: demand._id,
-          zone: demand.beneficiary.zone,
-        },
-      }),
-    );
+      )
+      .subscribe(
+        (res) => {},
+        (err) => console.log('Error getting demands from server! ', err),
+      );
   }
 
   filterChanged(): void {
@@ -204,7 +1149,6 @@ export class DemandsMapComponent implements OnDestroy, OnInit, AfterViewInit {
         (zone) => zone.toLowerCase() === this.selectedCityZone.toLowerCase(),
       );
       const coordinates = zonesCoordinates[selectedZone] ?? defaultCoordinate;
-      this.mapView.center = new Point(coordinates);
       currentFilter = { ...currentFilter, zone: selectedZone };
     }
     if (
@@ -234,49 +1178,29 @@ export class DemandsMapComponent implements OnDestroy, OnInit, AfterViewInit {
       case 2:
         if (this.selectedDemands.length === 0) {
           this.stepOnSelectionZone--;
-          this.snackMessage('Please select some demands');
+          this.snackBar.open('Please select some demands', '', {
+            duration: 3000,
+            panelClass: '', //additional CSS
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom',
+          });
           break;
         }
         break;
       case 3:
-        this.assignDemandsToVolunteer();
+        this.demandsService
+          .assignToVolunteer(this.selectedDemands, this.selectedVolunteer._id)
+          .subscribe(
+            () => {
+              this.stepOnSelectionZone = 3;
+            },
+            (err) => {
+              console.log('error', err.error);
+            },
+          );
         break;
       default:
         break;
     }
-  }
-
-  onSubmit(ev): void {
-    ev.preventDefault();
-  }
-
-  assignDemandsToVolunteer() {
-    from(
-      this.demandsService.assignToVolunteer(
-        this.selectedDemands,
-        this.selectedVolunteer._id,
-      ),
-    ).subscribe(
-      () => {
-        this.stepOnSelectionZone = 3;
-      },
-      (err) => {
-        console.log('error', err.error);
-      },
-    );
-  }
-
-  snackMessage(msg: string) {
-    this.snackBar.open(msg, '', {
-      duration: 3000,
-      panelClass: '', //additional CSS
-      horizontalPosition: 'right',
-      verticalPosition: 'bottom',
-    });
-  }
-
-  ngOnDestroy() {
-    this.mapView?.destroy();
-    this.graphicsLayer.destroy();
   }
 }

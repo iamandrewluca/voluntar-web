@@ -1,36 +1,16 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { from } from 'rxjs';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import Map from '@arcgis/core/Map';
-import Graphic from '@arcgis/core/Graphic';
-import Point from '@arcgis/core/geometry/Point';
-import MapView from '@arcgis/core/views/MapView';
-import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
-import config from '@arcgis/core/config.js';
-
 import { DemandsService } from '../../demands.service';
 import { Demand } from '@demands/shared/demand';
-import { demandTypes } from '@demands/shared/demand-type';
+import { DemandType, demandTypes } from '@demands/shared/demand-type';
 import { Volunteer } from '@volunteers/shared/volunteer';
-import { Coordinate, zones, zonesCoordinates } from '@shared/zone';
-import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
+import { Zone, zones } from '@shared/zone';
 import { SelectableDemand } from '@demands/shared/the-map/the-map.component';
-
-config.assetsPath = '/assets';
-
-const defaultCoordinate: Coordinate = {
-  latitude: 47.024758255143986,
-  longitude: 28.83263462925968,
-};
+import { WeekDay, weekDays } from '@shared/week-day';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { VolunteersService } from '@volunteers/volunteers.service';
 
 @Component({
   selector: 'app-demands-map',
@@ -38,21 +18,12 @@ const defaultCoordinate: Coordinate = {
   styleUrls: ['./demands-map.component.scss'],
 })
 export class DemandsMapComponent implements OnInit {
-  demands: Demand[] = [];
   zones = zones;
   demandTypes = demandTypes;
-  form = new FormGroup({
-    city_sector: new FormControl(''),
-    needs: new FormControl(''),
-  });
-  stepOnSelectionZone = 1;
-  selectedDemands: Demand[] = [];
-  selectedVolunteer: Volunteer = null;
-  selectedCityZone = '';
-  selectedDemandTypeFilter = '';
-  anyDemand = 'any';
+  zone = new FormControl('all');
+  type = new FormControl('all');
 
-  testDemands = ([
+  demands: Demand[] = ([
     {
       _id: '60068ce6e8b98d3798a733d7',
       beneficiary: {
@@ -1090,10 +1061,56 @@ export class DemandsMapComponent implements OnInit {
         last_name: 'Cretu',
       },
     },
-  ] as unknown) as SelectableDemand[];
+  ] as unknown) as Demand[];
+  selectedDemands: Demand[] = [];
+
+  stepOnSelectionZone = 1;
+  selectedVolunteer?: Volunteer;
+
+  selectedDemandDate: Date;
+  public volunteers: Volunteer[] = [];
+  public filterVolunteerByNameOrFamily = '';
+  public selectedVol?: Volunteer;
+
+  constructor(
+    private demandsService: DemandsService,
+    private volunteerService: VolunteersService,
+    private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar,
+  ) {}
+
+  ngOnInit(): any {
+    // this.volunteers$ = this.volunteerService
+    //   .getVolunteers({ pageIndex: 1, pageSize: Number.MAX_SAFE_INTEGER })
+    //   .subscribe((vol) => {
+    //     this.volunteers = [...vol.list];
+    //     // due to detect strategy where changed on parent level
+    //     this.cdr.detectChanges();
+    //   });
+    this.getDemands();
+  }
+
+  volunteerClicked(id: string) {
+    this.selectedVol = this.volunteers.find((v) => v._id === id);
+    this.selectedVolunteer = this.selectedVol;
+  }
+
+  checkIfVolunteerAvailable(days: WeekDay[]): boolean {
+    // if no any date selected - we show all volunteers
+    if (!this.selectedDemandDate) return true;
+
+    const todayDay = this.selectedDemandDate.getDay();
+    const selectedDayOfTheWeek = weekDays[todayDay];
+
+    return days.includes(selectedDayOfTheWeek);
+  }
+
+  onDateChange(event: MatDatepickerInputEvent<unknown>) {
+    this.selectedDemandDate = event.value as Date;
+  }
 
   demandClick(demand: SelectableDemand) {
-    this.testDemands = this.testDemands.map((d) =>
+    this.demands = this.demands.map((d) =>
       d._id !== demand._id
         ? d
         : {
@@ -1103,74 +1120,32 @@ export class DemandsMapComponent implements OnInit {
     );
   }
 
-  constructor(
-    private demandsService: DemandsService,
-    private cdr: ChangeDetectorRef,
-    private snackBar: MatSnackBar,
-  ) {}
-
-  ngOnInit(): any {
-    this.initializeDemandsOnTheMap('init');
-  }
-
-  initializeDemandsOnTheMap(
-    status: 'init' | 'filter',
-    filters: any = {},
-  ): void {
+  getDemands(filters: { zone?: Zone; type?: DemandType } = {}) {
     this.demandsService
       .getDemands(
         {
           pageIndex: 1,
-          pageSize: 20000,
+          pageSize: Number.MAX_SAFE_INTEGER,
         },
         {
           status: 'confirmed',
           ...filters,
         },
       )
-      .subscribe(
-        (res) => {},
-        (err) => console.log('Error getting demands from server! ', err),
-      );
+      .subscribe();
   }
 
   filterChanged(): void {
-    let selectedZone = this.zones[0];
-    let currentFilter = {};
-
-    this.selectedCityZone = `${this.form.get('city_sector').value}`;
-    this.selectedDemandTypeFilter = `${this.form.get('needs').value}`;
-
-    if (
-      this.selectedCityZone &&
-      'toate'.normalize() !== this.selectedCityZone.normalize()
-    ) {
-      selectedZone = this.zones.find(
-        (zone) => zone.toLowerCase() === this.selectedCityZone.toLowerCase(),
-      );
-      const coordinates = zonesCoordinates[selectedZone] ?? defaultCoordinate;
-      currentFilter = { ...currentFilter, zone: selectedZone };
-    }
-    if (
-      this.selectedDemandTypeFilter &&
-      this.selectedDemandTypeFilter.normalize() !== this.anyDemand.normalize()
-    ) {
-      currentFilter = {
-        ...currentFilter,
-        type: this.selectedDemandTypeFilter,
-      };
-    }
-    this.initializeDemandsOnTheMap('filter', currentFilter);
-  }
-
-  selectedVolunteerProvided(ev) {
-    this.selectedVolunteer = ev;
+    this.getDemands({
+      zone: this.zone.value !== 'all' ? this.zone.value : undefined,
+      type: this.type.value !== 'all' ? this.type.value : undefined,
+    });
   }
 
   nextFormStep(): void {
     if (this.stepOnSelectionZone === 3) {
       this.stepOnSelectionZone = 1;
-      this.initializeDemandsOnTheMap('init');
+      this.getDemands();
     } else {
       this.stepOnSelectionZone++;
     }
@@ -1202,5 +1177,9 @@ export class DemandsMapComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  demandListClick($event: Demand) {
+    console.log($event);
   }
 }

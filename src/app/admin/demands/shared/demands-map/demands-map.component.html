@@ -1,7 +1,7 @@
 <div class="row no-gutters bg-white mat-typography my-3">
   <div class="col-8">
     <app-the-map
-      [demands]="testDemands"
+      [demands]="demands"
       (demandClick)="demandClick($event)"
     ></app-the-map>
   </div>
@@ -12,70 +12,108 @@
       <strong *ngSwitchCase="3">FINISH!</strong>
     </h3>
 
-    <div class="container py-3 bg-light border-top border-bottom">
+    <div class="container py-2 bg-light border-top border-bottom">
       <div class="row">
         <div class="col-6">
-          <label class="mb-0 d-block">
-            <select name="" id="1" class="w-100">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </label>
+          <mat-select
+            [formControl]="zone"
+            placeholder="Sector"
+            (selectionChange)="filterChanged()"
+          >
+            <mat-option value="all">
+              {{ "all" | translate }}
+            </mat-option>
+            <mat-option *ngFor="let zone of zones" [value]="zone">
+              {{ zone | translate }}
+            </mat-option>
+          </mat-select>
         </div>
         <div class="col-6">
-          <label class="mb-0 d-block">
-            <select name="" id="2" class="w-100">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </label>
+          <mat-select
+            [formControl]="type"
+            placeholder="Necesitate"
+            (selectionChange)="filterChanged()"
+          >
+            <mat-option value="all">
+              {{ "all" | translate }}
+            </mat-option>
+            <mat-option *ngFor="let demand of demandTypes" [value]="demand">
+              {{ demand | translate }}
+            </mat-option>
+          </mat-select>
         </div>
       </div>
     </div>
 
     <ng-container [ngSwitch]="stepOnSelectionZone">
-      <div *ngSwitchCase="1">
-        <div
-          fxLayout="row"
-          fxLayoutAlign="space-around center"
-          style="border: 1px solid #ccc"
-        >
-          <div fxFlex="45" style="background-color: aquamarine">
-            <mat-select
-              formControlName="city_sector"
-              placeholder="Sector"
-              (selectionChange)="filterChanged()"
-            >
-              <mat-option>{{ "toate" | translate }}</mat-option>
-              <mat-option *ngFor="let zone of zones" [value]="zone">
-                {{ zone | translate }}
-              </mat-option>
-            </mat-select>
-          </div>
-          <div fxFlex="45" style="background-color: rgb(51, 185, 141)">
-            <mat-select
-              formControlName="needs"
-              placeholder="Necesitate"
-              (selectionChange)="filterChanged()"
-            >
-              <mat-option [value]="anyDemand">any</mat-option>
-              <mat-option *ngFor="let demand of demandTypes" [value]="demand">
-                {{ demand | translate }}
-              </mat-option>
-            </mat-select>
-          </div>
-        </div>
-        <app-demand-selection
-          [selectedDemands]="selectedDemands"
-        ></app-demand-selection>
-      </div>
+      <app-demands-map-list
+        *ngSwitchCase="1"
+        [demands]="demands"
+        (demandClick)="demandListClick($event)"
+      ></app-demands-map-list>
 
-      <app-volunteer-selection
-        *ngSwitchCase="2"
-        (selectedVolunteer)="selectedVolunteerProvided($event)"
-      ></app-volunteer-selection>
+      <div class="d-none">
+        <div style="background-color: rgb(44, 153, 117)">
+          <mat-form-field class="" appearance="fill">
+            <mat-label>Choose a date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              placeholder="Choose a date"
+              (dateInput)="onDateChange($event)"
+              title=""
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker">
+              <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="" appearance="fill">
+            <mat-label>Filter by Name or Family</mat-label>
+            <input
+              matInput
+              [(ngModel)]="filterVolunteerByNameOrFamily"
+              placeholder="filter by name or family"
+              title=""
+            />
+          </mat-form-field>
+        </div>
+        <cdk-virtual-scroll-viewport itemSize="50" class="cdk-viewport">
+          <div
+            *cdkVirtualFor="
+              let vol of volunteers
+                | filterByNameOrFamily: filterVolunteerByNameOrFamily
+            "
+            (click)="volunteerClicked(vol._id)"
+          >
+            <div *ngIf="checkIfVolunteerAvailable(vol.availability_days)">
+              <mat-card style="width: auto; height: auto; padding: 9px 11px">
+                <mat-card-header
+                  style="border: 1px solid rgb(131, 63, 63)"
+                  [style.backgroundColor]="
+                    !!selectedVol && selectedVol._id === vol._id
+                      ? 'red'
+                      : 'white'
+                  "
+                >
+                  <mat-card-title>
+                    <mat-icon svgIcon="selection-dot"></mat-icon>
+                    {{ vol.first_name + " " + vol.last_name }}
+                  </mat-card-title>
+                  <mat-card-subtitle>
+                    <mat-icon style="font-size: 16px">place</mat-icon>
+                    {{ vol.address }}
+                  </mat-card-subtitle>
+                  <mat-card-subtitle>
+                    <mat-icon style="font-size: 16px">mail</mat-icon>
+                    <!-- {{ vol.type || "nedeterminat" }} -->
+                  </mat-card-subtitle>
+                </mat-card-header>
+              </mat-card>
+            </div>
+          </div>
+        </cdk-virtual-scroll-viewport>
+      </div>
 
       <div *ngSwitchCase="3">
         <p>Sarcina este În Proces.</p>

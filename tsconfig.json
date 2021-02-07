@@ -16,7 +16,7 @@
     // Turn to true after, after started local dev server
     // This way IDE will show strict errors
     // And dev-server will not crash
-    "strict": false,
+    "strict": true,
     // Disable this, because in Angular some times
     // properties are initialized in init, or after view init
     "strictPropertyInitialization": false,

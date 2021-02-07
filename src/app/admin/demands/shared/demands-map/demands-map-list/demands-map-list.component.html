@@ -1,0 +1,28 @@
+<mat-list
+  role="list"
+  class="mat-typography"
+  style="max-height: 400px; overflow-y: scroll"
+>
+  <mat-list-item
+    *ngFor="let demand of demands"
+    class="border-bottom h-auto py-2"
+    style="cursor: pointer"
+    (click)="demandClick.emit(demand)"
+    role="listitem"
+  >
+    <div class="w-100">
+      <div>
+        <mat-icon svgIcon="selection-dot"></mat-icon>
+        {{ demand.beneficiary.first_name }} {{ demand.beneficiary.last_name }}
+      </div>
+      <div>
+        <mat-icon>place</mat-icon>
+        {{ demand.beneficiary.zone }}
+      </div>
+      <div>
+        <mat-icon [svgIcon]="demand.type"></mat-icon>
+        {{ demand.type | translate }}
+      </div>
+    </div>
+  </mat-list-item>
+</mat-list>

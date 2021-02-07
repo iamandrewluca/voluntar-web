@@ -10,10 +10,9 @@ import { demandsRoutes } from './demands.routes';
 import { DemandAddressFieldComponent } from './demand-details/demand-address-field/demand-address-field.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { DemandsMapComponent } from './shared/demands-map/demands-map.component';
-import { DemandSelectionOnMapComponent } from './shared/demands-map/demand-selection/demand-selection.component';
-import { VolunteerSelectionOnMapComponent } from './shared/demands-map/volunteer-selection/volunteer-selection.component';
 import { FilterByNameOrFamilyPipe } from '@app/shared/pipes/filter-by-name-or-family.pipe';
 import { TheMapComponent } from '@demands/shared/the-map/the-map.component';
+import { DemandsMapListComponent } from '@demands/shared/demands-map/demands-map-list/demands-map-list.component';
 
 @NgModule({
   declarations: [
@@ -21,8 +20,7 @@ import { TheMapComponent } from '@demands/shared/the-map/the-map.component';
     DemandsListComponent,
     DemandAddressFieldComponent,
     DemandsMapComponent,
-    DemandSelectionOnMapComponent,
-    VolunteerSelectionOnMapComponent,
+    DemandsMapListComponent,
     FilterByNameOrFamilyPipe,
     TheMapComponent,
   ],
